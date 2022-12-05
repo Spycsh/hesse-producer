@@ -67,7 +67,7 @@ def create_requests(path: str, loop: bool, json_path):
 class KProducer(object):
 
     def __init__(self, broker, topic):
-        client = KafkaAdminClient(bootstrap_servers='localhost:9092')
+        client = KafkaAdminClient(bootstrap_servers=broker)
         rsp = client.create_partitions({
             env(APP_KAFKA_TOPIC): NewPartitions(KAFKA_PARTITIONS_NUM)
         })
