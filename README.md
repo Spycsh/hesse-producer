@@ -12,5 +12,9 @@ git push
 docker pull spycsh/graph-producer
 docker exec -it <container id> /bin/sh
 rm -f main.py
-wget <path to raw main.py on GitHub>
+wget https://raw.githubusercontent.com/Spycsh/hesse-producer/main/main.py
+exit
+docker commit -m="specify partition number" -a="spycsh" <container id> spycsh/hesse-producer
+docker login
+docker push spycsh/hesse-producer
 ```

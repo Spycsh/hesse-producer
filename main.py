@@ -36,7 +36,7 @@ APP_DELAY_SECONDS = Arg(key="APP_DELAY_SECONDS", default="1", type=int)
 APP_DELAY_START_SECONDS = Arg(key="APP_DELAY_START_SECONDS", default="1", type=int)
 APP_LOOP = Arg(key="APP_LOOP", default="true", type=lambda s: s.lower() == "true")
 APP_JSON_PATH = Arg(key="APP_JSON_PATH", default="name", type=parse)
-KAFKA_PARTITIONS_NUM = Arg(key="KAFKA_PARTITIONS_NUM", default="4", type=parse)
+KAFKA_PARTITIONS_NUM = Arg(key="KAFKA_PARTITIONS_NUM", default="4", type=int)
 
 
 def env(arg: Arg):
