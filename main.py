@@ -69,7 +69,7 @@ class KProducer(object):
     def __init__(self, broker, topic):
         client = KafkaAdminClient(bootstrap_servers=broker)
         rsp = client.create_partitions({
-            env(APP_KAFKA_TOPIC): NewPartitions(KAFKA_PARTITIONS_NUM)
+            env(APP_KAFKA_TOPIC): NewPartitions(env(KAFKA_PARTITIONS_NUM))
         })
         print(rsp)
         self.producer = KafkaProducer(bootstrap_servers=[broker])
