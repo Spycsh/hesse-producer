@@ -24,6 +24,7 @@ from collections import namedtuple
 from itertools import cycle
 
 from kafka import KafkaAdminClient
+from kafka.admin import NewTopic
 from kafka.admin.new_partitions import NewPartitions
 
 from kafka.errors import NoBrokersAvailable
@@ -68,11 +69,9 @@ class KProducer(object):
 
     def __init__(self, broker, topic):
         client = KafkaAdminClient(bootstrap_servers=broker)
-        client.create_topics([topic])
-        rsp = client.create_partitions({
-            topic: NewPartitions(env(KAFKA_PARTITIONS_NUM))
-        })
-        print(rsp)
+        topic_list = [NewTopic(name=topic, num_partitions=env(KAFKA_PARTITIONS_NUM), replication_factor=1)]
+        client.create_topics(topic_list)
+        print("create {} partitions in topic {}...".format(env(KAFKA_PARTITIONS_NUM), topic))
         self.producer = KafkaProducer(bootstrap_servers=[broker])
         self.topic = topic
 
