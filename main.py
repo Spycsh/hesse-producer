@@ -23,10 +23,6 @@ import os
 from collections import namedtuple
 from itertools import cycle
 
-from kafka import KafkaAdminClient
-from kafka.admin import NewTopic
-from kafka.admin.new_partitions import NewPartitions
-
 from kafka.errors import NoBrokersAvailable
 from kafka import KafkaProducer
 from jsonpath_ng import parse
@@ -40,7 +36,8 @@ APP_DELAY_SECONDS = Arg(key="APP_DELAY_SECONDS", default="1", type=int)
 APP_DELAY_START_SECONDS = Arg(key="APP_DELAY_START_SECONDS", default="1", type=int)
 APP_LOOP = Arg(key="APP_LOOP", default="true", type=lambda s: s.lower() == "true")
 APP_JSON_PATH = Arg(key="APP_JSON_PATH", default="name", type=parse)
-KAFKA_PARTITIONS_NUM = Arg(key="KAFKA_PARTITIONS_NUM", default="4", type=int)
+APP_BATCH_SIZE = Arg(key="APP_BATCH_SIZE", default="16384", type=int)
+APP_LINGER_MS = Arg(key="APP_LINGER_MS", default="0", type=int)
 
 def env(arg: Arg):
     val = os.environ.get(arg.key, arg.default)
@@ -68,17 +65,13 @@ def create_requests(path: str, loop: bool, json_path):
 class KProducer(object):
 
     def __init__(self, broker, topic):
-        client = KafkaAdminClient(bootstrap_servers=broker)
-        topic_list = [NewTopic(name=topic, num_partitions=env(KAFKA_PARTITIONS_NUM), replication_factor=1)]
-        client.create_topics(topic_list)
-        print("create {} partitions in topic {}...".format(env(KAFKA_PARTITIONS_NUM), topic))
-        self.producer = KafkaProducer(bootstrap_servers=[broker])
+        self.producer = KafkaProducer(bootstrap_servers=[broker], batch_size=env(APP_BATCH_SIZE), linger_ms=env(APP_LINGER_MS))
         self.topic = topic
 
     def send(self, key: str, value: str):
         key = key.encode('utf-8')
         value = value.encode('utf-8')
-        self.producer.send(topic=self.topic, key=key, value=value, partition=hash(key) % int(env(KAFKA_PARTITIONS_NUM)))
+        self.producer.send(topic=self.topic, key=key, value=value)
         self.producer.flush()
 
 
